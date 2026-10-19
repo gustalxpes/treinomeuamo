@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Treino do meu amô</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAF8F7;
+    --card: #FFFFFF;
+    --border: #EAE5E3;
+    --text: #2B2726;
+    --text-muted: #8B8480;
+    --text-faint: #B7B1AE;
+    --pink: #E8B4BC;
+    --pink-deep: #B9707D;
+    --pink-text: #5C2A32;
+    --pink-soft-bg: #FBEEF0;
+    --pill-bg: #FAF8F7;
+    --overlay: rgba(43,39,38,0.42);
+    --input-bg: #FFFFFF;
+    --shadow: 0 1px 2px rgba(43,39,38,0.05);
+    --shadow-modal: 0 -8px 40px rgba(0,0,0,0.25);
+  }
+  html[data-theme="dark"] {
+    --bg: #171514;
+    --card: #211D1C;
+    --border: #332D2B;
+    --text: #F2ECEA;
+    --text-muted: #A79D99;
+    --text-faint: #786F6C;
+    --pink: #E8B4BC;
+    --pink-deep: #EFB9C2;
+    --pink-text: #3A1A1F;
+    --pink-soft-bg: #332226;
+    --pill-bg: #2A2422;
+    --overlay: rgba(0,0,0,0.6);
+    --input-bg: #2A2422;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    transition: background .15s, color .15s;
+    min-height: 100vh;
+  }
+  input, select, button, textarea { font-family: inherit; }
+  input::placeholder, textarea::placeholder { color: var(--text-faint); }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button { opacity: .3; }
+  button { font: inherit; cursor: pointer; }
+  button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 2px solid var(--pink); outline-offset: 1px;
+  }
+  ul { list-style: none; margin: 0; padding: 0; }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 18px 80px; }
+
+  header.top {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 26px; gap: 12px; flex-wrap: wrap;
+  }
+  h1.title {
+    font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+    font-size: 30px; letter-spacing: -0.02em; margin: 0; color: var(--text);
+  }
+  .top-actions { display: flex; align-items: center; gap: 8px; }
+
+  .icon-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px; border-radius: 9px; border: none;
+    background: transparent; color: var(--text);
+  }
+  .icon-btn svg { width: 17px; height: 17px; }
+  .icon-btn.sm { width: 26px; height: 26px; }
+  .icon-btn.sm svg { width: 13px; height: 13px; }
+
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--pink); color: var(--pink-text); border: none;
+    border-radius: 11px; padding: 10px 16px; font-size: 14px; font-weight: 600;
+  }
+  .btn-primary svg { width: 16px; height: 16px; }
+  .btn-primary.soft { background: var(--pink-soft-bg); color: var(--pink-deep); }
+  .btn-primary.block { justify-content: center; width: 100%; }
+  .btn-primary[disabled] { opacity: .5; cursor: default; }
+
+  .btn-ghost {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: transparent; color: var(--text); border: 1px solid var(--border);
+    border-radius: 11px; padding: 9px 14px; font-size: 13.5px; font-weight: 600;
+  }
+  .btn-ghost svg { width: 15px; height: 15px; }
+  .btn-ghost.danger { color: var(--pink-deep); }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 16px;
+  }
+
+  .day-card {
+    background: var(--card); border: 1px solid var(--border);
+    box-shadow: var(--shadow); border-radius: 16px; padding: 18px 16px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .day-card.today { border-color: var(--pink); box-shadow: 0 0 0 1px var(--pink); }
+
+  .day-head { display: flex; justify-content: space-between; align-items: flex-start; }
+  .day-label-row { display: flex; align-items: center; gap: 7px;
+    font-family: 'Space Grotesk', sans-serif; font-weight: 600;
+    font-size: 12.5px; letter-spacing: .09em; color: var(--text-muted); }
+  .day-card.today .day-label-row { color: var(--pink-deep); }
+  .today-badge {
+    font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 700;
+    letter-spacing: .06em; background: var(--pink-soft-bg); color: var(--pink-deep);
+    border-radius: 999px; padding: 2px 7px;
+  }
+  .day-title {
+    margin-top: 2px; font-size: 15.5px; font-weight: 600; cursor: pointer;
+    color: var(--text-faint); min-height: 20px;
+  }
+  .day-title.has-value { color: var(--text); }
+  .day-title-input {
+    margin-top: 3px; font-size: 14px; font-weight: 600; padding: 4px 8px;
+    border: 1px solid var(--border); border-radius: 10px; width: 100%;
+    background: var(--input-bg); color: var(--text); outline: none;
+  }
+
+  .rest-label {
+    padding: 18px 0; text-align: center; color: var(--text-faint);
+    font-size: 14px; font-weight: 500; letter-spacing: .02em;
+  }
+
+  .ex-item {
+    display: flex; align-items: center; gap: 8px; padding: 9px 8px;
+    border-radius: 10px; cursor: pointer; transition: background .12s;
+  }
+  .ex-item:hover { background: var(--bg); }
+  .ex-item .grip { color: var(--border); display: flex; cursor: grab; }
+  .ex-item .grip svg { width: 15px; height: 15px; }
+  .ex-item .idx {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--pink); width: 18px;
+  }
+  .ex-item .info { flex: 1; min-width: 0; }
+  .ex-item .name { font-size: 14.5px; font-weight: 500; color: var(--text); }
+  .ex-item .target {
+    font-size: 11.5px; color: var(--text-muted); font-family: 'IBM Plex Mono', monospace; margin-top: 1px;
+  }
+  .ex-item .chev { color: var(--text-faint); display: flex; }
+  .ex-item .chev svg { width: 16px; height: 16px; }
+  .ex-item.drag-over { background: var(--pink-soft-bg); }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed; inset: 0; background: var(--overlay);
+    display: flex; align-items: flex-end; justify-content: center;
+    z-index: 100; backdrop-filter: blur(2px);
+  }
+  .modal-box {
+    background: var(--card); color: var(--text); width: 100%; max-width: 460px;
+    max-height: 92vh; overflow-y: auto; border-radius: 20px 20px 0 0;
+    padding: 20px 20px 28px; box-shadow: var(--shadow-modal);
+  }
+  .modal-box.wide { max-width: 480px; }
+  .modal-box.narrow { max-width: 380px; }
+  @media (min-width: 640px) {
+    .modal-box { border-radius: 20px; margin-top: auto; margin-bottom: auto; }
+  }
+  .modal-head { display: flex; justify-content: space-between; align-items: center; }
+  .modal-head h2 {
+    font-family: 'Space Grotesk', sans-serif; font-size: 19px; font-weight: 700; margin: 0; color: var(--text);
+  }
+  .modal-head.detail { align-items: flex-start; }
+  .modal-head .head-actions { display: flex; gap: 6px; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .field label { font-size: 12.5px; font-weight: 600; color: var(--text-muted); }
+  .field input, .field select, .field textarea {
+    border: 1px solid var(--border); border-radius: 10px; padding: 9px 11px;
+    font-size: 14px; outline: none; width: 100%; background: var(--input-bg); color: var(--text);
+  }
+  .field textarea { resize: vertical; font-family: inherit; }
+  .field-row { display: flex; gap: 12px; }
+  .field-row .field { flex: 1; }
+
+  .ex-target { font-size: 12.5px; color: var(--pink-deep); font-weight: 600; margin-top: 3px; }
+  .section-label {
+    font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 700;
+    letter-spacing: .06em; color: var(--text-muted); text-transform: uppercase;
+  }
+  .note-box {
+    margin-top: 6px; font-size: 14px; line-height: 1.55; color: var(--text);
+    background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 12px; white-space: pre-wrap;
+  }
+
+  .video-link { text-decoration: none; }
+
+  .confirm-msg { font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-top: 12px; }
+  .confirm-actions { display: flex; gap: 10px; margin-top: 18px; }
+  .confirm-actions button { flex: 1; justify-content: center; }
+  .confirm-actions .danger { background: var(--pink-deep); color: #fff; }
+
+  .loading {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    color: var(--text-muted); font-family: 'Inter', sans-serif;
+  }
+
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+
+<div id="loading" class="loading">Carregando…</div>
+
+<div id="app" hidden>
+  <div class="wrap">
+    <header class="top">
+      <h1 class="title">Treino do meu amô</h1>
+      <div class="top-actions">
+        <button id="themeToggle" class="icon-btn" title="Alternar tema"></button>
+        <button id="addExerciseBtn" class="btn-primary">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          Adicionar exercício
+        </button>
+      </div>
+    </header>
+
+    <div id="grid" class="grid"></div>
+  </div>
+</div>
+
+<div id="modalRoot"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* =================================================================
+   Configuração do Supabase
+   -> Preencha com os dados do seu projeto (Project Settings > API)
+================================================================= */
+const SUPABASE_URL = "https://zrlaysiargcvysxbbjjm.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpybGF5c2lhcmdjdnlzeGJiamptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI0NDE4NjcsImV4cCI6MjEwODAxNzg2N30.yz0gfD1DiTgG4I26HH1Cl1kMQCVavIBw9125iSHN8p4";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* =================================================================
+   Dados / helpers
+================================================================= */
+const DIAS = [
+  { key: 0, label: "Segunda-feira" },
+  { key: 1, label: "Terça-feira" },
+  { key: 2, label: "Quarta-feira" },
+  { key: 3, label: "Quinta-feira" },
+  { key: 4, label: "Sexta-feira" },
+  { key: 5, label: "Sábado" },
+  { key: 6, label: "Domingo" },
+];
+const ICONS = {
+  plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>',
+  pencil: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+  chevronRight: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
+  grip: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.4"/><circle cx="15" cy="6" r="1.4"/><circle cx="9" cy="12" r="1.4"/><circle cx="15" cy="12" r="1.4"/><circle cx="9" cy="18" r="1.4"/><circle cx="15" cy="18" r="1.4"/></svg>',
+  play: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
+  trash: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6h16Z"/></svg>',
+  sun: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"/></svg>',
+  moon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>',
+};
+
+function uid() {
+  try { return crypto.randomUUID(); }
+  catch { return "id-" + Math.random().toString(36).slice(2) + Date.now().toString(36); }
+}
+
+function defaultState() {
+  return {
+    theme: "light",
+    dayTitles: { 0: "", 1: "", 2: "", 3: "", 4: "", 5: "", 6: "" },
+    exercises: [], // {id, name, day, videoUrl, order, targetSets, targetReps, note}
+  };
+}
+
+// JS getDay(): 0=Domingo..6=Sábado. Nossos dias: 0=Segunda..6=Domingo.
+function todayKey() {
+  const js = new Date().getDay();
+  return (js + 6) % 7;
+}
+
+function formatTarget(ex) {
+  const s = ex.targetSets ? String(ex.targetSets).trim() : "";
+  const r = ex.targetReps ? String(ex.targetReps).trim() : "";
+  if (s && r) return `${s} séries × ${r} reps`;
+  if (s) return `${s} séries`;
+  if (r) return `${r} reps`;
+  return null;
+}
+
+function esc(str) {
+  const d = document.createElement("div");
+  d.textContent = str ?? "";
+  return d.innerHTML;
+}
+
+/* =================================================================
+   Estado + persistência (Supabase, sem login — dado único compartilhado)
+================================================================= */
+const ROW_ID = "main";
+
+let state = defaultState();
+let saveTimer = null;
+let dragInfo = null; // { day, fromIndex }
+
+function persist() {
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    try {
+      const { error } = await sb
+        .from("workout_data")
+        .upsert({ id: ROW_ID, state, updated_at: new Date().toISOString() }, { onConflict: "id" });
+      if (error) console.error("Falha ao salvar", error);
+    } catch (e) { console.error("Falha ao salvar", e); }
+  }, 250);
+}
+
+function update(mutator) {
+  mutator(state);
+  persist();
+  render();
+}
+
+async function loadState() {
+  try {
+    const { data, error } = await sb
+      .from("workout_data")
+      .select("state")
+      .eq("id", ROW_ID)
+      .maybeSingle();
+    if (error) throw error;
+    if (data && data.state) {
+      state = { ...defaultState(), ...data.state };
+    } else {
+      state = defaultState();
+      await sb.from("workout_data").insert({ id: ROW_ID, state });
+    }
+  } catch (e) {
+    console.error("Falha ao carregar", e);
+    state = defaultState();
+  }
+  document.getElementById("loading").hidden = true;
+  document.getElementById("app").hidden = false;
+  applyTheme();
+  render();
+}
+
+function applyTheme() {
+  document.documentElement.setAttribute("data-theme", state.theme);
+  const btn = document.getElementById("themeToggle");
+  btn.innerHTML = state.theme === "dark" ? ICONS.sun : ICONS.moon;
+  btn.title = state.theme === "dark" ? "Ativar tema claro" : "Ativar tema escuro";
+}
+
+/* =================================================================
+   Ações de dados
+================================================================= */
+function exercisesByDay(day) {
+  return state.exercises.filter(e => e.day === day).sort((a, b) => a.order - b.order);
+}
+
+function addExercise({ name, day, videoUrl, targetSets, targetReps, note }) {
+  const dayExercises = exercisesByDay(day);
+  update(s => {
+    s.exercises.push({
+      id: uid(), name: name.trim(), day, videoUrl: videoUrl.trim(),
+      targetSets: targetSets ? targetSets.trim() : "",
+      targetReps: targetReps ? targetReps.trim() : "",
+      note: note ? note.trim() : "",
+      order: dayExercises.length,
+    });
+  });
+}
+
+function editExercise(id, patch) {
+  update(s => {
+    s.exercises = s.exercises.map(e => e.id === id ? { ...e, ...patch } : e);
+  });
+}
+
+function deleteExercise(id) {
+  update(s => { s.exercises = s.exercises.filter(e => e.id !== id); });
+}
+
+function reorderDay(day, orderedIds) {
+  update(s => {
+    s.exercises = s.exercises.map(e => {
+      if (e.day !== day) return e;
+      const idx = orderedIds.indexOf(e.id);
+      return idx === -1 ? e : { ...e, order: idx };
+    });
+  });
+}
+
+function setDayTitle(day, title) {
+  update(s => { s.dayTitles[day] = title; });
+}
+
+function toggleTheme() {
+  update(s => { s.theme = s.theme === "dark" ? "light" : "dark"; });
+  applyTheme();
+}
+
+/* =================================================================
+   Render: grade de dias
+================================================================= */
+function render() {
+  const grid = document.getElementById("grid");
+  const hoje = todayKey();
+  grid.innerHTML = "";
+  DIAS.forEach(d => grid.appendChild(renderDayCard(d, d.key === hoje)));
+}
+
+function renderDayCard(dia, isToday) {
+  const card = document.createElement("div");
+  card.className = "day-card" + (isToday ? " today" : "");
+
+  const list = exercisesByDay(dia.key);
+  const isRest = list.length === 0;
+  const titulo = state.dayTitles[dia.key] || "";
+
+  const head = document.createElement("div");
+  head.className = "day-head";
+
+  const labelWrap = document.createElement("div");
+  labelWrap.style.minWidth = "0";
+  labelWrap.style.flex = "1";
+
+  const labelRow = document.createElement("div");
+  labelRow.className = "day-label-row";
+  labelRow.innerHTML = `${dia.label.toUpperCase()}` + (isToday ? `<span class="today-badge">HOJE</span>` : "");
+  labelWrap.appendChild(labelRow);
+
+  const titleEl = document.createElement("div");
+  titleEl.className = "day-title" + (titulo ? " has-value" : "");
+  titleEl.title = "Editar nome do treino";
+  titleEl.textContent = isRest ? "" : (titulo || "Exercícios");
+  titleEl.addEventListener("click", () => startEditDayTitle(dia.key, labelWrap, titleEl, titulo));
+  labelWrap.appendChild(titleEl);
+
+  head.appendChild(labelWrap);
+
+  const addBtn = document.createElement("button");
+  addBtn.className = "icon-btn";
+  addBtn.title = "Adicionar exercício";
+  addBtn.innerHTML = ICONS.plus;
+  addBtn.addEventListener("click", () => openExerciseForm({ mode: "add", day: dia.key }));
+  head.appendChild(addBtn);
+
+  card.appendChild(head);
+
+  if (isRest) {
+    const rest = document.createElement("div");
+    rest.className = "rest-label";
+    rest.textContent = "Descanso";
+    card.appendChild(rest);
+  } else {
+    const ul = document.createElement("ul");
+    list.forEach((ex, i) => ul.appendChild(renderExerciseItem(ex, i, dia.key, list)));
+    card.appendChild(ul);
+  }
+
+  return card;
+}
+
+function startEditDayTitle(day, wrap, titleEl, currentValue) {
+  const input = document.createElement("input");
+  input.className = "day-title-input";
+  input.value = currentValue;
+  input.placeholder = "Nome do treino (opcional)";
+  wrap.replaceChild(input, titleEl);
+  input.focus();
+  input.select();
+
+  function commit() {
+    setDayTitle(day, input.value);
+  }
+  input.addEventListener("blur", commit);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") input.blur();
+    if (e.key === "Escape") { input.value = currentValue; input.blur(); }
+  });
+}
+
+function renderExerciseItem(ex, index, day, listRef) {
+  const li = document.createElement("li");
+  li.className = "ex-item";
+  li.draggable = true;
+
+  li.addEventListener("dragstart", () => { dragInfo = { day, fromIndex: index }; });
+  li.addEventListener("dragover", (e) => { e.preventDefault(); li.classList.add("drag-over"); });
+  li.addEventListener("dragleave", () => li.classList.remove("drag-over"));
+  li.addEventListener("drop", () => {
+    li.classList.remove("drag-over");
+    if (!dragInfo || dragInfo.day !== day) return;
+    const ids = listRef.map(e => e.id);
+    const [moved] = ids.splice(dragInfo.fromIndex, 1);
+    ids.splice(index, 0, moved);
+    reorderDay(day, ids);
+    dragInfo = null;
+  });
+
+  const grip = document.createElement("span");
+  grip.className = "grip";
+  grip.innerHTML = ICONS.grip;
+  li.appendChild(grip);
+
+  const idx = document.createElement("span");
+  idx.className = "idx";
+  idx.textContent = String(index + 1).padStart(2, "0");
+  li.appendChild(idx);
+
+  const info = document.createElement("span");
+  info.className = "info";
+  const target = formatTarget(ex);
+  info.innerHTML = `<div class="name">${esc(ex.name)}</div>` + (target ? `<div class="target">${esc(target)}</div>` : "");
+  li.appendChild(info);
+
+  const editBtn = document.createElement("button");
+  editBtn.className = "icon-btn sm";
+  editBtn.title = "Editar";
+  editBtn.innerHTML = ICONS.pencil;
+  editBtn.addEventListener("click", (e) => { e.stopPropagation(); openExerciseForm({ mode: "edit", exercise: ex }); });
+  li.appendChild(editBtn);
+
+  const chev = document.createElement("span");
+  chev.className = "chev";
+  chev.innerHTML = ICONS.chevronRight;
+  li.appendChild(chev);
+
+  li.addEventListener("click", () => openExerciseDetail(ex));
+
+  return li;
+}
+
+/* =================================================================
+   Modais
+================================================================= */
+const modalRoot = document.getElementById("modalRoot");
+
+function closeModal() {
+  modalRoot.innerHTML = "";
+}
+
+function openOverlay(buildFn, opts = {}) {
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) closeModal(); });
+
+  const box = document.createElement("div");
+  box.className = "modal-box" + (opts.wide ? " wide" : "") + (opts.narrow ? " narrow" : "");
+  box.addEventListener("click", (e) => e.stopPropagation());
+
+  buildFn(box, closeModal);
+
+  overlay.appendChild(box);
+  modalRoot.innerHTML = "";
+  modalRoot.appendChild(overlay);
+}
+
+/* ---- Formulário adicionar/editar exercício ---- */
+function openExerciseForm({ mode, day, exercise }) {
+  const isEdit = mode === "edit";
+  const ex = exercise;
+
+  openOverlay((box) => {
+    box.innerHTML = `
+      <div class="modal-head">
+        <h2>${isEdit ? "Editar exercício" : "Adicionar exercício"}</h2>
+        <button class="icon-btn" id="closeFormBtn">${ICONS.x}</button>
+      </div>
+      <div style="margin-top:14px;">
+        <div class="field">
+          <label>Nome do exercício</label>
+          <input id="fName" type="text" placeholder="Ex: Supino reto" value="${esc(isEdit ? ex.name : "")}" />
+        </div>
+        <div class="field">
+          <label>Dia da semana</label>
+          <select id="fDay">
+            ${DIAS.map(d => `<option value="${d.key}" ${d.key === (isEdit ? ex.day : day) ? "selected" : ""}>${d.label}</option>`).join("")}
+          </select>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Séries (opcional)</label>
+            <input id="fSets" type="text" inputmode="numeric" placeholder="Ex: 3" value="${esc(isEdit ? ex.targetSets || "" : "")}" />
+          </div>
+          <div class="field">
+            <label>Repetições (opcional)</label>
+            <input id="fReps" type="text" placeholder="Ex: 10-12" value="${esc(isEdit ? ex.targetReps || "" : "")}" />
+          </div>
+        </div>
+        <div class="field">
+          <label>Vídeo de execução (opcional)</label>
+          <input id="fVideo" type="text" placeholder="URL do vídeo (YouTube ou outro link)" value="${esc(isEdit ? ex.videoUrl || "" : "")}" />
+        </div>
+        <div class="field">
+          <label>Observação (opcional)</label>
+          <textarea id="fNote" rows="3" placeholder="Ex: cuidado com a lombar, ajustar banco na posição 3">${esc(isEdit ? ex.note || "" : "")}</textarea>
+        </div>
+        <button id="fSubmit" class="btn-primary block" style="margin-top:6px;">${isEdit ? "Salvar alterações" : "Adicionar exercício"}</button>
+        ${isEdit ? `<button id="fDelete" class="btn-ghost danger" style="justify-content:center;width:100%;margin-top:10px;">${ICONS.trash} Excluir exercício</button>` : ""}
+      </div>
+    `;
+
+    const nameInput = box.querySelector("#fName");
+    const submitBtn = box.querySelector("#fSubmit");
+    function syncSubmit() {
+      const has = nameInput.value.trim().length > 0;
+      submitBtn.disabled = !has;
+      submitBtn.style.opacity = has ? "1" : ".5";
+    }
+    nameInput.addEventListener("input", syncSubmit);
+    syncSubmit();
+    nameInput.focus();
+
+    box.querySelector("#closeFormBtn").addEventListener("click", closeModal);
+
+    submitBtn.addEventListener("click", () => {
+      const vals = {
+        name: nameInput.value,
+        day: Number(box.querySelector("#fDay").value),
+        videoUrl: box.querySelector("#fVideo").value,
+        targetSets: box.querySelector("#fSets").value,
+        targetReps: box.querySelector("#fReps").value,
+        note: box.querySelector("#fNote").value,
+      };
+      if (!vals.name.trim()) return;
+      if (isEdit) editExercise(ex.id, vals); else addExercise(vals);
+      closeModal();
+    });
+
+    if (isEdit) {
+      box.querySelector("#fDelete").addEventListener("click", () => {
+        openConfirmDelete(ex);
+      });
+    }
+  });
+}
+
+/* ---- Confirmação de exclusão ---- */
+function openConfirmDelete(ex) {
+  openOverlay((box) => {
+    box.innerHTML = `
+      <div class="modal-head">
+        <h2>Excluir exercício</h2>
+        <button class="icon-btn" id="closeConfirmBtn">${ICONS.x}</button>
+      </div>
+      <p class="confirm-msg">Tem certeza que deseja excluir "${esc(ex.name)}"?</p>
+      <div class="confirm-actions">
+        <button class="btn-ghost" id="cancelDeleteBtn">Cancelar</button>
+        <button class="btn-primary danger" id="confirmDeleteBtn">Excluir</button>
+      </div>
+    `;
+    box.querySelector("#closeConfirmBtn").addEventListener("click", closeModal);
+    box.querySelector("#cancelDeleteBtn").addEventListener("click", closeModal);
+    box.querySelector("#confirmDeleteBtn").addEventListener("click", () => {
+      deleteExercise(ex.id);
+      closeModal();
+    });
+  }, { narrow: true });
+}
+
+/* ---- Detalhe do exercício (vídeo + observação) ---- */
+function openExerciseDetail(exercise) {
+  // usa a versão mais atual do exercício
+  const ex = state.exercises.find(e => e.id === exercise.id) || exercise;
+  const target = formatTarget(ex);
+
+  openOverlay((box) => {
+    box.innerHTML = `
+      <div class="modal-head detail">
+        <div>
+          <h2>${esc(ex.name)}</h2>
+          ${target ? `<div class="ex-target">${esc(target)}</div>` : ""}
+        </div>
+        <div class="head-actions">
+          <button class="icon-btn" id="editFromDetailBtn" title="Editar exercício">${ICONS.pencil}</button>
+          <button class="icon-btn" id="closeDetailBtn">${ICONS.x}</button>
+        </div>
+      </div>
+      ${ex.videoUrl ? `<div style="margin-top:14px;"><a id="playVideoBtn" class="btn-primary soft video-link" href="${esc(ex.videoUrl)}" target="_blank" rel="noreferrer">${ICONS.play} Ver execução</a></div>` : ""}
+      ${ex.note ? `<div style="margin-top:18px;"><div class="section-label">Observação</div><p class="note-box">${esc(ex.note)}</p></div>` : ""}
+    `;
+
+    box.querySelector("#closeDetailBtn").addEventListener("click", closeModal);
+    box.querySelector("#editFromDetailBtn").addEventListener("click", () => {
+      closeModal();
+      openExerciseForm({ mode: "edit", exercise: ex });
+    });
+  }, { wide: true });
+}
+
+/* =================================================================
+   Inicialização
+================================================================= */
+document.getElementById("themeToggle").addEventListener("click", toggleTheme);
+document.getElementById("addExerciseBtn").addEventListener("click", () => openExerciseForm({ mode: "add", day: todayKey() }));
+
+loadState();
+</script>
+</body>
+</html>
